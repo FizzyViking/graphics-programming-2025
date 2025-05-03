@@ -1,6 +1,12 @@
 #include "TerrainApplication.h"
 
 // (todo) 01.1: Include the libraries you need
+#include <ituGL/core/DeviceGL.h>
+#include <ituGL/application/Window.h>
+#include <ituGL/geometry/VertexBufferObject.h>
+#include <ituGL/geometry/VertexArrayObject.h>
+#include <ituGL/geometry/VertexAttribute.h>
+#include <ituGL/geometry/ElementBufferObject.h>
 
 #include <cmath>
 #include <iostream>
@@ -41,7 +47,7 @@ void TerrainApplication::Initialize()
 
     // Build shaders and store in m_shaderProgram
     BuildShaders();
-
+    
     // (todo) 01.1: Create containers for the vertex position
 
 
