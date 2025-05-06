@@ -8,8 +8,12 @@
 #include <ituGL/geometry/VertexAttribute.h>
 #include <ituGL/geometry/ElementBufferObject.h>
 
+#define STB_PERLIN_IMPLEMENTATION
+#include <stb_perlin.h>
+
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 // Helper structures. Declared here only for this exercise
 struct Vector2
@@ -33,11 +37,29 @@ struct Vector3
 };
 
 // (todo) 01.8: Declare an struct with the vertex format
+struct Vertex
+{
+	Vector3 position;
+	Vector2 texCoord;
+	Vector3 color;
+	Vector3 normal;
+};
 
-
+static Vector3 getColorFromHeight(float z) {
+    if (z > 0.3f) { // Mountain top, white
+        return Vector3(1.0f, 1.0f, 1.0f);
+    }
+    if (z > 0.15) { // Mountain, dark gray
+        return Vector3(0.1f, 0.1f, 0.1f);
+    }
+    if (z > -0.1f) { // Forest, green
+        return Vector3(0.0f, 0.1f, 0.0f);
+    }
+    return Vector3(0.0f, 0.5f, 1.0f);
+}
 
 TerrainApplication::TerrainApplication()
-    : Application(1024, 1024, "Terrain demo"), m_gridX(16), m_gridY(16), m_shaderProgram(0)
+    : Application(1024, 1024, "Terrain demo"), m_gridX(128), m_gridY(128), m_shaderProgram(0)
 {
 }
 
@@ -49,22 +71,107 @@ void TerrainApplication::Initialize()
     BuildShaders();
     
     // (todo) 01.1: Create containers for the vertex position
+    std::vector<Vertex> vertices;
 
+    std::vector<unsigned int> indices;
 
+    // Create a scale for the vertices
+	Vector2 scale(1.0f / m_gridX, 1.0f / m_gridY);
+    unsigned int columns = m_gridX + 1;
+    unsigned int rows = m_gridY + 1;
+    
     // (todo) 01.1: Fill in vertex data
+    for (unsigned int i = 0u; i < columns; i++)
+    {
+        for (unsigned int j = 0u; j < rows; j++) {
 
+			// Create the vertex position
+            // Calculate the bottom-left corner of the quad
+            Vector3 position = Vector3(i * scale.x - 0.5f, j * scale.y - 0.5f, 0.0f);
+
+            // Define the two triangles for the quad
+            Vertex vertex;
+            float z = stb_perlin_fbm_noise3(position.x*2, position.y*2, 0.0f, 2.0f, 0.5f, 6);
+			vertex.position = Vector3(position.x, position.y, z);
+			vertex.texCoord = Vector2(static_cast<float>(i), static_cast<float>(j));
+			vertex.color = getColorFromHeight(z);
+			vertex.normal = Vector3(0.0f, 0.0f, 1.0f);
+            vertices.push_back(vertex);
+			
+            if (i > 0 && j > 0) {
+                // Calculate the indices for the two triangles
+                unsigned int topRight = j * columns + i;
+                unsigned int topLeft = topRight - 1;
+                unsigned int bottomLeft = topLeft - columns;
+                unsigned int bottomRight = bottomLeft + 1;
+
+                // First triangle
+                indices.push_back(topLeft);          
+                indices.push_back(topRight);              
+                indices.push_back(bottomRight);
+                // Second triangle
+                indices.push_back(topLeft);
+                indices.push_back(bottomLeft);                        
+                indices.push_back(bottomRight);
+                
+            }
+            
+        }
+    }
+
+    
+    for (unsigned int i = 0u; i < rows; i++)
+    {
+        for (unsigned int j = 0u; j < columns; j++) {
+            unsigned int current = i * columns + j;
+
+            Vertex& vertex = vertices[current]; // Current vertex
+            Vertex& vertex_right = (j < m_gridX) ? vertices[current + 1] : vertices[current];
+            Vertex& vertex_left = (j > 0) ? vertices[current - 1] : vertices[current];
+
+            Vertex& vertex_up = (i < m_gridY) ? vertices[current + columns] : vertices[current];
+            Vertex& vertex_down = (i > 0) ? vertices[current - columns] : vertices[current];
+
+            float delta_x = (vertex_right.position.z - vertex_left.position.z) / (vertex_right.position.x - vertex_left.position.x);
+            float delta_y = (vertex_up.position.z - vertex_down.position.z) / (vertex_up.position.y - vertex_down.position.y);
+            vertex.normal = Vector3(delta_x, delta_y, 1.0f).Normalize();
+        }
+    }
 
     // (todo) 01.1: Initialize VAO, and VBO
+	m_vbo.Bind();
+    m_vbo.AllocateData<Vertex>(std::span(vertices));
+
+	VertexAttribute positionAttribute(Data::Type::Float, 3);
+	VertexAttribute texCoordAttribute(Data::Type::Float, 2);
+	VertexAttribute colorAttribute(Data::Type::Float, 3);
+	VertexAttribute normalAttribute(Data::Type::Float, 3);
+
+    // Calculate stride
+	GLsizei stride = sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3) + sizeof(Vector3);
+
+    m_vao.Bind();
+	m_vao.SetAttribute(0, positionAttribute, 0u, stride); // Position attribute
+	m_vao.SetAttribute(1, texCoordAttribute, (0u + positionAttribute.GetSize()), stride); // Texture coordinate attribute
+	m_vao.SetAttribute(2, colorAttribute, (0u + positionAttribute.GetSize()) + texCoordAttribute.GetSize(), stride); // Color attribute
+	m_vao.SetAttribute(3, normalAttribute, ((0u + positionAttribute.GetSize()) + texCoordAttribute.GetSize()) + colorAttribute.GetSize(), stride); // Normal attribute
 
 
     // (todo) 01.5: Initialize EBO
-
+    m_ebo.Bind();
+    m_ebo.AllocateData(std::span(indices));
 
     // (todo) 01.1: Unbind VAO, and VBO
+    //m_vbo.Unbind();
+	VertexBufferObject::Unbind();
+	VertexArrayObject::Unbind();
+	//m_vao.Unbind();
 
 
     // (todo) 01.5: Unbind EBO
+	ElementBufferObject::Unbind();
 
+    glEnable(GL_DEPTH_TEST);
 }
 
 void TerrainApplication::Update()
@@ -85,7 +192,10 @@ void TerrainApplication::Render()
     glUseProgram(m_shaderProgram);
 
     // (todo) 01.1: Draw the grid
-
+    m_vao.Bind();
+    // Wireframe mode
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawElements(GL_TRIANGLES, m_gridX * m_gridY * 6, GL_UNSIGNED_INT, nullptr);
 }
 
 void TerrainApplication::Cleanup()

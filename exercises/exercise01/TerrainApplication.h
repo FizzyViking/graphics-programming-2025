@@ -31,9 +31,9 @@ private:
     unsigned int m_shaderProgram;
 
     // (todo) 01.1: Declare an VBO, VAO
-    VertexBufferObject VBO;
-    VertexArrayObject VAO;
+    VertexBufferObject m_vbo;
+    VertexArrayObject m_vao;
 
     // (todo) 01.5: Declare an EBO
-
+	ElementBufferObject m_ebo;
 };
