@@ -15,15 +15,23 @@ struct Particle
 {
     glm::vec2 position;
     // (todo) 02.X: Add more vertex attributes
- 
+    float size;
+    float birth;
+    float duration;
+    Color color;
+    glm::vec2 velocity;
 };
 
 // List of attributes of the particle. Must match the structure above
-const std::array<VertexAttribute, 1> s_vertexAttributes =
+const std::array<VertexAttribute, 6> s_vertexAttributes =
 {
     VertexAttribute(Data::Type::Float, 2), // position
     // (todo) 02.X: Add more vertex attributes
-
+    VertexAttribute(Data::Type::Float, 1), // size
+    VertexAttribute(Data::Type::Float, 1), // birth
+    VertexAttribute(Data::Type::Float, 1), // duration
+    VertexAttribute(Data::Type::Float, 4), // color
+    VertexAttribute(Data::Type::Float, 2), // velocity
 };
 
 
@@ -44,10 +52,16 @@ void ParticlesApplication::Initialize()
     m_mousePosition = GetMainWindow().GetMousePosition(true);
 
     // (todo) 02.2: Enable the GL_PROGRAM_POINT_SIZE feature on the device
-
+    GetDevice().EnableFeature(GL_PROGRAM_POINT_SIZE);
+    //glEnable(GL_PROGRAM_POINT_SIZE);
+    //glPointSize(GLfloat(4.0f));
 
     // (todo) 02.3: Enable the GL_BLEND feature on the device
+    GetDevice().EnableFeature(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+    currentTime_Uniform_Location = m_shaderProgram.GetUniformLocation("CurrentTime");
+    m_gravity_Location = m_shaderProgram.GetUniformLocation("Gravity");
 
     // We need to enable V-sync, otherwise the framerate would be too high and spawn multiple particles in one click
     GetDevice().SetVSyncEnabled(true);
@@ -66,9 +80,9 @@ void ParticlesApplication::Update()
     if (window.IsMouseButtonPressed(Window::MouseButton::Left))
     {
         // (todo) 02.X: Compute new particle attributes here
+        float size = RandomRange(1.0f, 20.0f);
 
-
-        EmitParticle(mousePosition);
+        EmitParticle(mousePosition, size, RandomColor(), mousePosition - m_mousePosition);
     }
 
     // save the mouse position (to compare next frame and obtain velocity)
@@ -84,10 +98,10 @@ void ParticlesApplication::Render()
     m_shaderProgram.Use();
 
     // (todo) 02.4: Set CurrentTime uniform
-
+    m_shaderProgram.SetUniform(currentTime_Uniform_Location, GetCurrentTime());
 
     // (todo) 02.6: Set Gravity uniform
-
+    m_shaderProgram.SetUniform(m_gravity_Location, glm::vec2(2.82f, 0.0f));
 
     // Bind the particle system VAO
     m_vao.Bind();
@@ -131,11 +145,13 @@ void ParticlesApplication::InitializeShaders()
 {
     // Load and compile vertex shader
     Shader vertexShader(Shader::VertexShader);
-    LoadAndCompileShader(vertexShader, "shaders/particles.vert");
+    //LoadAndCompileShader(vertexShader, "shaders/particles.vert");
+    LoadAndCompileShader(vertexShader, "D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise02/shaders/particles.vert");
 
     // Load and compile fragment shader
     Shader fragmentShader(Shader::FragmentShader);
-    LoadAndCompileShader(fragmentShader, "shaders/particles.frag");
+    //LoadAndCompileShader(fragmentShader, "shaders/particles.frag");
+    LoadAndCompileShader(fragmentShader, "D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise02/shaders/particles.frag");
 
     // Attach shaders and link
     if (!m_shaderProgram.Build(vertexShader, fragmentShader))
@@ -144,14 +160,19 @@ void ParticlesApplication::InitializeShaders()
     }
 }
 
-void ParticlesApplication::EmitParticle(const glm::vec2& position)
+void ParticlesApplication::EmitParticle(const glm::vec2& position, const float size, Color color, const glm::vec2& deltaMousePos)
 {
     // Initialize the particle
     Particle particle;
     particle.position = position;
     // (todo) 02.X: Set the value for other attributes of the particle
-
-
+    particle.size = size;
+    particle.birth = GetCurrentTime();
+    particle.duration = RandomRange(1.0f, 2.0f);
+    particle.color = color;
+    //particle.velocity = (deltaMousePos / GetDeltaTime()) * 0.8f;
+    particle.velocity = RandomDirection() * RandomRange(0.1f, 2.0f);
+    
     // Get the index in the circular buffer
     unsigned int particleIndex = m_particleCount % m_particleCapacity;
 

@@ -26,7 +26,7 @@ private:
     void LoadAndCompileShader(Shader& shader, const char* path);
 
     // Emit a new particle
-    void EmitParticle(const glm::vec2& position);
+    void EmitParticle(const glm::vec2& position, const float size, Color color, const glm::vec2& deltaMousePos);
 
     // Helper methods for random values
     static float Random01();
@@ -52,4 +52,8 @@ private:
 
     // Max number of particles that can exist at the same time
     const unsigned int m_particleCapacity;
+
+    // Member variable to store CurrentTime and Gravity uniform location
+    GLint currentTime_Uniform_Location;
+    GLint m_gravity_Location;
 };
