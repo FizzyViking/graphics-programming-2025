@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <filesystem>
+
 // Structure defining that Particle data
 struct Particle
 {
@@ -170,6 +172,11 @@ void ParticlesApplication::EmitParticle(const glm::vec2& position)
 void ParticlesApplication::LoadAndCompileShader(Shader& shader, const char* path)
 {
     // Open the file for reading
+    
+    // Get the directory of the executable
+    std::string executableDir = std::filesystem::current_path().string();
+    std::cout << "Executable: " << executableDir << std::endl;
+
     std::ifstream file(path);
     if (!file.is_open())
     {
