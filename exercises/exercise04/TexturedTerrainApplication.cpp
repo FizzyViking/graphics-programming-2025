@@ -83,10 +83,10 @@ void TexturedTerrainApplication::InitializeTextures()
     m_defaultTexture = CreateDefaultTexture();
 
     // Load terrain textures
-    m_dirtTexture = LoadTexture("textures/dirt.png");
-    m_grassTexture = LoadTexture("textures/grass.jpg");
-    m_rockTexture = LoadTexture("textures/rock.jpg");
-    m_snowTexture = LoadTexture("textures/snow.jpg");
+    m_dirtTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/dirt.png");
+    m_grassTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/grass.jpg");
+    m_rockTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/rock.jpg");
+    m_snowTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/snow.jpg");
 
     m_heightmapTexture00 = CreateHeightMap(m_gridX, m_gridY, glm::ivec2(0, 0));
     m_heightmapTexture10 = CreateHeightMap(m_gridX, m_gridY, glm::ivec2(-1, 0));
@@ -100,8 +100,8 @@ void TexturedTerrainApplication::InitializeTextures()
 void TexturedTerrainApplication::InitializeMaterials()
 {
     // Default shader program
-    Shader defaultVS = m_vertexShaderLoader.Load("shaders/default.vert");
-    Shader defaultFS = m_fragmentShaderLoader.Load("shaders/default.frag");
+    Shader defaultVS = m_vertexShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/default.vert");
+    Shader defaultFS = m_fragmentShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/default.frag");
     std::shared_ptr<ShaderProgram> defaultShaderProgram = std::make_shared<ShaderProgram>();
     defaultShaderProgram->Build(defaultVS, defaultFS);
 
@@ -110,8 +110,8 @@ void TexturedTerrainApplication::InitializeMaterials()
     m_defaultMaterial->SetUniformValue("Color", glm::vec4(1.0f));
 
     // Terrain shader program
-    Shader terrainVS = m_vertexShaderLoader.Load("shaders/terrain.vert");
-    Shader terrainFS = m_fragmentShaderLoader.Load("shaders/terrain.frag");
+    Shader terrainVS = m_vertexShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/terrain.vert");
+    Shader terrainFS = m_fragmentShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/terrain.frag");
     std::shared_ptr<ShaderProgram> terrainShaderProgram = std::make_shared<ShaderProgram>();
     terrainShaderProgram->Build(terrainVS, terrainFS);
 
@@ -138,8 +138,8 @@ void TexturedTerrainApplication::InitializeMaterials()
     m_terrainMaterial11->SetUniformValue("Heightmap", m_heightmapTexture11);
 
     // Water shader
-    Shader waterVS = m_vertexShaderLoader.Load("shaders/water.vert");
-    Shader waterFS = m_fragmentShaderLoader.Load("shaders/water.frag");
+    Shader waterVS = m_vertexShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/water.vert");
+    Shader waterFS = m_fragmentShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/water.frag");
     std::shared_ptr<ShaderProgram> waterShaderProgram = std::make_shared<ShaderProgram>();
     waterShaderProgram->Build(waterVS, waterFS);
 
