@@ -41,6 +41,8 @@ void TexturedTerrainApplication::Initialize()
 
     //Enable wireframe
     //GetDevice().SetWireframeEnabled(true);
+
+    GetDevice().EnableFeature(GL_BLEND);
 }
 
 void TexturedTerrainApplication::Update()
@@ -75,7 +77,10 @@ void TexturedTerrainApplication::Render()
 
     // Water patches
     // (todo) 04.5: Add water planes
-
+    DrawObject(m_terrainPatch, *m_waterMaterial, glm::translate(glm::vec3(0, -1, 0)) * glm::scale(glm::vec3(10.0f)));
+    DrawObject(m_terrainPatch, *m_waterMaterial, glm::translate(glm::vec3(0, -1, -10.0f)) * glm::scale(glm::vec3(10.0f)));
+    DrawObject(m_terrainPatch, *m_waterMaterial, glm::translate(glm::vec3(0, -1, 0)) * glm::scale(glm::vec3(10.0f)));
+    DrawObject(m_terrainPatch, *m_waterMaterial, glm::translate(glm::vec3(-10.0f, -1, -10.0f)) * glm::scale(glm::vec3(10.0f)));
 }
 
 void TexturedTerrainApplication::InitializeTextures()
@@ -95,7 +100,7 @@ void TexturedTerrainApplication::InitializeTextures()
     m_snowTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/snow.jpg");
 
     // (todo) 04.5: Load water texture here
-
+    m_waterTexture = LoadTexture("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/textures/water.png");
 }
 
 void TexturedTerrainApplication::InitializeMaterials()
@@ -120,9 +125,10 @@ void TexturedTerrainApplication::InitializeMaterials()
     m_terrainMaterial0->SetUniformValue("Color", glm::vec4(1.0f));
     m_terrainMaterial0->SetUniformValue("ColorTextureScale", glm::vec2(0.1f));
     m_terrainMaterial0->SetUniformValue("Heightmap", m_heightmapTexture0);
-    m_terrainMaterial0->SetUniformValue("HeightRange1", glm::vec2(-0.2f, 0.1f));
-    m_terrainMaterial0->SetUniformValue("HeightRange2", glm::vec2(0.1f, 0.5f));
-    m_terrainMaterial0->SetUniformValue("HeightRange3", glm::vec2(0.5f, 1.0f));
+    m_terrainMaterial0->SetUniformValue("HeightRange1", glm::vec2(-0.1f, 0.2f));
+    m_terrainMaterial0->SetUniformValue("HeightRange2", glm::vec2(0.15f, 0.2f));
+    m_terrainMaterial0->SetUniformValue("HeightRange3", glm::vec2(0.2f, 0.5f));
+
     m_terrainMaterial0->SetUniformValue("ColorTextureGrass", m_grassTexture);
     m_terrainMaterial0->SetUniformValue("ColorTextureDirt", m_dirtTexture);
     m_terrainMaterial0->SetUniformValue("ColorTextureRock", m_rockTexture);
@@ -139,7 +145,18 @@ void TexturedTerrainApplication::InitializeMaterials()
     
 
     // (todo) 04.5: Add water shader and material here
+    Shader waterVS = m_vertexShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/water.vert");
+    Shader waterFS = m_fragmentShaderLoader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise04/shaders/water.frag");
+    std::shared_ptr<ShaderProgram> waterShaderProgram = std::make_shared<ShaderProgram>();
+    waterShaderProgram->Build(waterVS, waterFS);
 
+    m_waterMaterial = std::make_shared<Material>(waterShaderProgram);
+    m_waterMaterial->SetUniformValue("Color", glm::vec4(1.0f, 1.0f, 1.0f, 0.7f));
+    m_waterMaterial->SetUniformValue("ColorTextureScale", glm::vec2(0.1f));
+    m_waterMaterial->SetUniformValue("ColorTextureWater", m_waterTexture);
+
+    m_waterMaterial->SetBlendEquation(Material::BlendEquation::Add);
+    m_waterMaterial->SetBlendParams(Material::BlendParam::ConstantAlpha, Material::BlendParam::OneMinusSourceAlpha);
 
 }
 
