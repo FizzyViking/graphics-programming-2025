@@ -112,16 +112,16 @@ void SceneViewerApplication::InitializeMaterial()
 {
     // Load and build shader
     std::vector<const char*> vertexShaderPaths;
-    vertexShaderPaths.push_back("shaders/version330.glsl");
-    vertexShaderPaths.push_back("shaders/default.vert");
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/version330.glsl");
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/default.vert");
     Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
     std::vector<const char*> fragmentShaderPaths;
-    fragmentShaderPaths.push_back("shaders/version330.glsl");
-    fragmentShaderPaths.push_back("shaders/utils.glsl");
-    fragmentShaderPaths.push_back("shaders/blinn-phong.glsl");
-    fragmentShaderPaths.push_back("shaders/lighting.glsl");
-    fragmentShaderPaths.push_back("shaders/default.frag");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/version330.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/utils.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/blinn-phong.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/lighting.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/shaders/default.frag");
     Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
     std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -164,7 +164,7 @@ void SceneViewerApplication::InitializeMaterial()
 
 void SceneViewerApplication::InitializeModels()
 {
-    m_skyboxTexture = TextureCubemapLoader::LoadTextureShared("models/skybox/defaultCubemap.png", TextureObject::FormatRGB, TextureObject::InternalFormatSRGB8);
+    m_skyboxTexture = TextureCubemapLoader::LoadTextureShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/models/skybox/defaultCubemap.png", TextureObject::FormatRGB, TextureObject::InternalFormatSRGB8);
 
     m_skyboxTexture->Bind();
     float maxLod;
@@ -200,7 +200,7 @@ void SceneViewerApplication::InitializeModels()
     loader.SetMaterialProperty(ModelLoader::MaterialProperty::SpecularTexture, "SpecularTexture");
 
     // Load models
-    std::shared_ptr<Model> chestModel = loader.LoadShared("models/treasure_chest/treasure_chest.obj");
+    std::shared_ptr<Model> chestModel = loader.LoadShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise08/models/treasure_chest/treasure_chest.obj");
     m_scene.AddSceneNode(std::make_shared<SceneModel>("treasure chest", chestModel));
 
     //std::shared_ptr<Model> cameraModel = loader.LoadShared("models/camera/camera.obj");
