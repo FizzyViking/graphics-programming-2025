@@ -25,7 +25,7 @@ void ViewerApplication::Initialize()
 
     // Initialize DearImGUI
     m_imGui.Initialize(GetMainWindow());
-
+    
     InitializeModel();
     InitializeCamera();
     InitializeLights();
@@ -51,6 +51,7 @@ void ViewerApplication::Render()
     GetDevice().Clear(true, Color(0.0f, 0.0f, 0.0f, 1.0f), true, 1.0f);
 
     m_model.Draw();
+    RenderGUI();
 }
 
 void ViewerApplication::Cleanup()
@@ -63,6 +64,73 @@ void ViewerApplication::Cleanup()
 
 void ViewerApplication::InitializeModel()
 {
+    Shader vertexShader = ShaderLoader::Load(Shader::Type::VertexShader, "D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/shaders/blinn-phong.vert");
+    Shader fragmentShader = ShaderLoader::Load(Shader::Type::FragmentShader, "D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/shaders/blinn-phong.frag");
+    std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
+    shaderProgram->Build(vertexShader, fragmentShader);
+
+    // filtered uniform
+    ShaderUniformCollection::NameSet uniformFilter;
+    uniformFilter.insert("WorldMatrix");
+    uniformFilter.insert("ViewProjMatrix");
+    uniformFilter.insert("AmbientColor");
+    uniformFilter.insert("LightColor");
+    uniformFilter.insert("LightPosition");
+    uniformFilter.insert("CameraPosition");
+    //uniformFilter.insert("LightConstant");
+    //uniformFilter.insert("LightLinear");
+    //uniformFilter.insert("LightQuadratic");
+    //uniformFilter.insert("LightDirection");
+
+    // create material
+    std::shared_ptr<Material> material = std::make_shared<Material>(shaderProgram, uniformFilter);
+    material->SetUniformValue("Color", glm::vec4(1.0f));
+    material->SetUniformValue("AmbientReflection", 1.0f);
+    material->SetUniformValue("DiffuseReflection", 1.0f);
+    material->SetUniformValue("LightConstant", 1.0f);
+    material->SetUniformValue("LightLinear", 0.35f);
+    material->SetUniformValue("LightQuadratic", 0.44f);
+
+    ShaderProgram::Location worldMatrixLocation = material->GetUniformLocation("WorldMatrix");
+    ShaderProgram::Location viewProjLocation = material->GetUniformLocation("ViewProjMatrix");
+    ShaderProgram::Location ambientColorLocation = material->GetUniformLocation("AmbientColor");
+    ShaderProgram::Location lightColorLocation = material->GetUniformLocation("LightColor");
+    ShaderProgram::Location lightPositionLocation = material->GetUniformLocation("LightPosition");
+    ShaderProgram::Location cameraPositionLocation = material->GetUniformLocation("CameraPosition");
+    ShaderProgram::Location specularReflectionLocation = material->GetUniformLocation("SpecularReflection");
+    ShaderProgram::Location specularExponentLocation = material->GetUniformLocation("SpecularExponent");
+    //ShaderProgram::Location lightDirectionLocation = material->GetUniformLocation("LightDireciton");
+    material->SetShaderSetupFunction([=](ShaderProgram& shaderProgram) 
+    {
+        shaderProgram.SetUniform(worldMatrixLocation, glm::scale(glm::vec3(0.1f)));
+        shaderProgram.SetUniform(viewProjLocation, m_camera.GetViewProjectionMatrix());
+        shaderProgram.SetUniform(ambientColorLocation, m_ambientColor);
+        shaderProgram.SetUniform(lightColorLocation, m_lightColor * m_lightIntensity);
+        shaderProgram.SetUniform(lightPositionLocation, m_lightPosition);
+        shaderProgram.SetUniform(cameraPositionLocation, m_cameraPosition);
+        shaderProgram.SetUniform(specularReflectionLocation, m_specularReflection);
+        shaderProgram.SetUniform(specularExponentLocation, m_specularExponent);
+        //shaderProgram.SetUniform(lightDirectionLocation, m_lightDirection);
+    });
+
+    // model loader
+    ModelLoader loader(material);
+    loader.SetCreateMaterials(true);
+    loader.SetMaterialAttribute(VertexAttribute::Semantic::Position, "WorldPosition");
+    loader.SetMaterialAttribute(VertexAttribute::Semantic::Normal, "VertexNormal");
+    loader.SetMaterialAttribute(VertexAttribute::Semantic::TexCoord0, "VertexTexCoord");
+    
+    m_model = loader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/models/mill/Mill.obj");
+    Texture2DLoader textureLoader(TextureObject::Format::FormatRGBA, TextureObject::InternalFormat::InternalFormatRGBA8);
+    textureLoader.SetFlipVertical(true);
+    
+    m_model.GetMaterial(0).SetUniformValue("ColorTexture", textureLoader.LoadShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/models/mill/Ground_color.jpg"));
+    m_model.GetMaterial(1).SetUniformValue("ColorTexture", textureLoader.LoadShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/models/mill/Ground_shadow.jpg"));
+    m_model.GetMaterial(2).SetUniformValue("ColorTexture", textureLoader.LoadShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise05/models/mill/MillCat_color.jpg"));
+    
+    m_model.GetMaterial(0).SetUniformValue("AmbientReflection", 0.2f);
+    m_model.GetMaterial(0).SetUniformValue("AmbientReflection", 0.7f);
+    m_model.GetMaterial(0).SetUniformValue("AmbientReflection", 0.5f);
 }
 
 void ViewerApplication::InitializeCamera()
@@ -86,7 +154,16 @@ void ViewerApplication::RenderGUI()
     m_imGui.BeginFrame();
 
     // (todo) 05.4: Add debug controls for light properties
-
+    //ImGui::DragFloat3("LightDirection", &m_lightDirection.x);
+    //ImGui::NewLine();
+    ImGui::DragFloat("SpecularReflectionStrength", &m_specularReflection);
+    ImGui::DragFloat("SpecularExponent", &m_specularExponent);
+    ImGui::NewLine();
+    ImGui::ColorEdit3("AmbientColor", &m_ambientColor.x);
+    ImGui::NewLine();
+    ImGui::DragFloat3("LightPosition", &m_lightPosition.x);
+    ImGui::ColorEdit3("LightColor", &m_lightColor.x);
+    ImGui::DragFloat("LightIntensity", &m_lightIntensity);
     m_imGui.EndFrame();
 }
 
