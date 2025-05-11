@@ -29,13 +29,22 @@ float ClampedDot(vec3 v1, vec3 v2)
 vec3 GetImplicitNormal(vec2 normal)
 {
 	// (todo) 07.3: Obtain the implicit Z component of the normal
-	return vec3(0);
+	vec3 normal3D = vec3(normal, 0);
+	normal3D.z = sqrt(1 - dot(normal3D.xy, normal3D.xy));
+	//normal3D = normalize(normal3D);
+	return normal3D;
 }
 
 // Obtains a position in view space using the depth buffer and the inverse projection matrix
 vec3 ReconstructViewPosition(sampler2D depthTexture, vec2 texCoord, mat4 invProjMatrix)
 {
 	// (todo) 07.4: Reconstruct the position, using the screen texture coordinates and the depth
-	return vec3(0);
+	float depth = texture(depthTexture, texCoord).x;
+	// normalize the depth value to -1..1 range
+	depth = depth * 2.0 - 1.0;
+	vec4 clipSpacePos = vec4(texCoord * 2.0 - 1.0, depth, 1.0);
+	vec4 viewSpacePos = invProjMatrix * clipSpacePos;
+	viewSpacePos /= viewSpacePos.w;
+	return viewSpacePos.xyz;
 }
 

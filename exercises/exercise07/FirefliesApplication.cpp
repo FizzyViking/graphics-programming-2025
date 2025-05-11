@@ -12,7 +12,7 @@
 
 FirefliesApplication::FirefliesApplication()
     : Application(1024, 1024, "Fireflies demo")
-    , m_renderMode(RenderMode::Forward)
+    , m_renderMode(RenderMode::Deferred)
     , m_renderer(GetDevice())
     , m_mouseClicked(false)
     , m_ambientColor(0.0f)
@@ -121,16 +121,17 @@ void FirefliesApplication::InitializeForwardMaterials()
 {
     // Load and build shader
     std::vector<const char*> vertexShaderPaths;
-    vertexShaderPaths.push_back("shaders/version330.glsl");
-    vertexShaderPaths.push_back("shaders/lit.vert");
+    // D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/lit.vert");
     Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
     std::vector<const char*> fragmentShaderPaths;
-    fragmentShaderPaths.push_back("shaders/version330.glsl");
-    fragmentShaderPaths.push_back("shaders/utils.glsl");
-    fragmentShaderPaths.push_back("shaders/blinn-phong.glsl");
-    fragmentShaderPaths.push_back("shaders/lighting.glsl");
-    fragmentShaderPaths.push_back("shaders/lit.frag");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/utils.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/blinn-phong.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/lighting.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/lit.frag");
     Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
     std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -175,13 +176,13 @@ void FirefliesApplication::InitializeDeferredMaterials()
     {
         // Load and build shader
         std::vector<const char*> vertexShaderPaths;
-        vertexShaderPaths.push_back("shaders/version330.glsl");
-        vertexShaderPaths.push_back("shaders/gbuffer.vert");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/gbuffer.vert");
         Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
         std::vector<const char*> fragmentShaderPaths;
-        fragmentShaderPaths.push_back("shaders/version330.glsl");
-        fragmentShaderPaths.push_back("shaders/gbuffer.frag");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/gbuffer.frag");
         Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
         std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -213,16 +214,16 @@ void FirefliesApplication::InitializeDeferredMaterials()
     // Deferred material
     {
         std::vector<const char*> vertexShaderPaths;
-        vertexShaderPaths.push_back("shaders/version330.glsl");
-        vertexShaderPaths.push_back("shaders/deferred.vert");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/deferred.vert");
         Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
         std::vector<const char*> fragmentShaderPaths;
-        fragmentShaderPaths.push_back("shaders/version330.glsl");
-        fragmentShaderPaths.push_back("shaders/utils.glsl");
-        fragmentShaderPaths.push_back("shaders/blinn-phong.glsl");
-        fragmentShaderPaths.push_back("shaders/lighting.glsl");
-        fragmentShaderPaths.push_back("shaders/deferred.frag");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/version330.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/utils.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/blinn-phong.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/lighting.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/shaders/deferred.frag");
         Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
         std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -278,8 +279,8 @@ void FirefliesApplication::InitializeModels()
     loader.SetMaterialProperty(ModelLoader::MaterialProperty::SpecularExponent, "SpecularExponent");
 
     // Load models
-    m_fireflyModel = loader.Load("models/firefly/firefly.obj");
-    m_floorModel = loader.Load("models/floor/floor.obj");
+    m_fireflyModel = loader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/models/firefly/firefly.obj");
+    m_floorModel = loader.Load("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise07/models/floor/floor.obj");
 }
 
 void FirefliesApplication::InitializeCamera()
@@ -337,6 +338,7 @@ void FirefliesApplication::RenderGUI()
     ImGui::Separator();
     ImGui::ColorEdit3("Light color", &m_lightColor[0]);
     ImGui::DragFloat("Light intensity", &m_lightIntensity, 0.05f, 0.0f, 100.0f);
+    ImGui::DragFloat2("Light Attenuation", &m_lightAttenuation.x, 0.5f, 0.0f, 100.0f);
     ImGui::Checkbox("Use random color", &m_useRandomColor);
 
     m_imGui.EndFrame();
@@ -389,6 +391,7 @@ void FirefliesApplication::AddFirefly(glm::vec2 position2D)
     pointLight.SetPosition(position3D);
     pointLight.SetColor(m_useRandomColor ? glm::vec3(RandomColor()) : m_lightColor);
     pointLight.SetIntensity(m_lightIntensity);
+    pointLight.SetDistanceAttenuation(m_lightAttenuation);
 
     firefly.worldMatrix = glm::translate(position3D) * glm::rotate(RandomRange(-3.1416f, 3.1416f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.25f));
 
