@@ -120,14 +120,14 @@ void PostFXSceneViewerApplication::InitializeMaterials()
     {
         // Load and build shader
         std::vector<const char*> vertexShaderPaths;
-        vertexShaderPaths.push_back("shaders/version330.glsl");
-        vertexShaderPaths.push_back("shaders/default.vert");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/default.vert");
         Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
         std::vector<const char*> fragmentShaderPaths;
-        fragmentShaderPaths.push_back("shaders/version330.glsl");
-        fragmentShaderPaths.push_back("shaders/utils.glsl");
-        fragmentShaderPaths.push_back("shaders/default.frag");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/utils.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/default.frag");
         Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
         std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -160,16 +160,16 @@ void PostFXSceneViewerApplication::InitializeMaterials()
     // Deferred material
     {
         std::vector<const char*> vertexShaderPaths;
-        vertexShaderPaths.push_back("shaders/version330.glsl");
-        vertexShaderPaths.push_back("shaders/renderer/deferred.vert");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+        vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/renderer/deferred.vert");
         Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
         std::vector<const char*> fragmentShaderPaths;
-        fragmentShaderPaths.push_back("shaders/version330.glsl");
-        fragmentShaderPaths.push_back("shaders/utils.glsl");
-        fragmentShaderPaths.push_back("shaders/lambert-ggx.glsl");
-        fragmentShaderPaths.push_back("shaders/lighting.glsl");
-        fragmentShaderPaths.push_back("shaders/renderer/deferred.frag");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/utils.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/lambert-ggx.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/lighting.glsl");
+        fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/renderer/deferred.frag");
         Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
         std::shared_ptr<ShaderProgram> shaderProgramPtr = std::make_shared<ShaderProgram>();
@@ -212,7 +212,7 @@ void PostFXSceneViewerApplication::InitializeMaterials()
 
 void PostFXSceneViewerApplication::InitializeModels()
 {
-    m_skyboxTexture = TextureCubemapLoader::LoadTextureShared("models/skybox/yoga_studio.hdr", TextureObject::FormatRGB, TextureObject::InternalFormatRGB16F);
+    m_skyboxTexture = TextureCubemapLoader::LoadTextureShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/models/skybox/yoga_studio.hdr", TextureObject::FormatRGB, TextureObject::InternalFormatRGB16F);
 
     m_skyboxTexture->Bind();
     float maxLod;
@@ -246,7 +246,7 @@ void PostFXSceneViewerApplication::InitializeModels()
     loader.SetMaterialProperty(ModelLoader::MaterialProperty::SpecularTexture, "SpecularTexture");
 
     // Load models
-    std::shared_ptr<Model> cannonModel = loader.LoadShared("models/cannon/cannon.obj");
+    std::shared_ptr<Model> cannonModel = loader.LoadShared("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/models/cannon/cannon.obj");
     m_scene.AddSceneNode(std::make_shared<SceneModel>("cannon", cannonModel));
 }
 
@@ -258,7 +258,7 @@ void PostFXSceneViewerApplication::InitializeFramebuffers()
     // Scene Texture
     m_sceneTexture = std::make_shared<Texture2DObject>();
     m_sceneTexture->Bind();
-    m_sceneTexture->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormat::InternalFormatSRGBA8);
+    m_sceneTexture->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormat::InternalFormatRGBA16F);
     m_sceneTexture->SetParameter(TextureObject::ParameterEnum::MinFilter, GL_LINEAR);
     m_sceneTexture->SetParameter(TextureObject::ParameterEnum::MagFilter, GL_LINEAR);
     Texture2DObject::Unbind();
@@ -271,6 +271,23 @@ void PostFXSceneViewerApplication::InitializeFramebuffers()
     FramebufferObject::Unbind();
 
     // (todo) 09.3: Add temp textures and frame buffers
+	for (int i = 0; i < m_temporaryFramebuffers.size(); ++i)
+	{
+		m_temporaryTextures[i] = std::make_shared<Texture2DObject>();
+		m_temporaryTextures[i]->Bind();
+		m_temporaryTextures[i]->SetImage(0, width, height, TextureObject::FormatRGBA, TextureObject::InternalFormat::InternalFormatRGBA16F);
+        m_temporaryTextures[i]->SetParameter(TextureObject::ParameterEnum::WrapS, GL_CLAMP_TO_EDGE);
+        m_temporaryTextures[i]->SetParameter(TextureObject::ParameterEnum::WrapT, GL_CLAMP_TO_EDGE);
+		m_temporaryTextures[i]->SetParameter(TextureObject::ParameterEnum::MinFilter, GL_LINEAR);
+		m_temporaryTextures[i]->SetParameter(TextureObject::ParameterEnum::MagFilter, GL_LINEAR);
+
+		m_temporaryFramebuffers[i] = std::make_shared<FramebufferObject>();
+		m_temporaryFramebuffers[i]->Bind();
+		m_temporaryFramebuffers[i]->SetTexture(FramebufferObject::Target::Draw, FramebufferObject::Attachment::Color0, *m_temporaryTextures[i]);
+		m_temporaryFramebuffers[i]->SetDrawBuffers(std::array<FramebufferObject::Attachment, 1>({ FramebufferObject::Attachment::Color0 }));
+	}
+    Texture2DObject::Unbind();
+    FramebufferObject::Unbind();
 
 }
 
@@ -304,41 +321,57 @@ void PostFXSceneViewerApplication::InitializeRenderer()
     m_renderer.AddRenderPass(std::make_unique<SkyboxRenderPass>(m_skyboxTexture));
 
     // (todo) 09.3: Create a copy pass from m_sceneTexture to the first temporary texture
-
+    //std::shared_ptr<Material> copyMaterial = CreatePostFXMaterial("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/postfx/copy.frag", m_sceneTexture);
+    //m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(copyMaterial, m_temporaryFramebuffers[0]));
 
     // (todo) 09.4: Replace the copy pass with a new bloom pass
-
+    m_bloomMaterial = CreatePostFXMaterial("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/postfx/bloom.frag", m_sceneTexture);
+    m_bloomMaterial->SetUniformValue("Intensity", m_intensity);
+    m_bloomMaterial->SetUniformValue("Range", m_range);
+    m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(m_bloomMaterial, m_temporaryFramebuffers[0]));
 
     // (todo) 09.3: Add blur passes
+    std::shared_ptr<Material> horizontalBlur = CreatePostFXMaterial("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/postfx/blur.frag", m_temporaryTextures[0]);
+    horizontalBlur->SetUniformValue("Scale", glm::vec2(1.0f / width, 0.0f));
+    std::shared_ptr<Material> verticalBlur = CreatePostFXMaterial("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/postfx/blur.frag", m_temporaryTextures[1]);
+    verticalBlur->SetUniformValue("Scale", glm::vec2(0.0f, 1.0f / height));
 
+    for (int i = 0; i < m_blurIterations; i++)
+    {
+        m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(horizontalBlur, m_temporaryFramebuffers[1]));
+        m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(verticalBlur, m_temporaryFramebuffers[0]));
+    }
 
     // Final pass
     // (todo) 09.1: Replace with a new m_composeMaterial, using a new shader
-    std::shared_ptr<Material> copyMaterial = CreatePostFXMaterial("shaders/postfx/copy.frag", m_sceneTexture);
-    m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(copyMaterial, m_renderer.GetDefaultFramebuffer()));
+    m_composeMaterial = CreatePostFXMaterial("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/postfx/compose.frag", m_sceneTexture);
 
     // (todo) 09.1: Set exposure uniform default value
-
+    m_composeMaterial->SetUniformValue("Exposure", m_exposure);
 
     // (todo) 09.2: Set uniform default values
-
+    m_composeMaterial->SetUniformValue("Contrast", m_contrast);
+    m_composeMaterial->SetUniformValue("HueShift", m_hueShift);
+    m_composeMaterial->SetUniformValue("Saturation", m_saturation);
+    m_composeMaterial->SetUniformValue("ColorFilter", m_colorFilter);
 
     // (todo) 09.4: Set the bloom texture uniform
+    m_bloomMaterial->SetUniformValue("BloomTexture", m_temporaryTextures[0]);
 
-
+    m_renderer.AddRenderPass(std::make_unique<PostFXRenderPass>(m_composeMaterial, m_renderer.GetDefaultFramebuffer()));
 }
 
 std::shared_ptr<Material> PostFXSceneViewerApplication::CreatePostFXMaterial(const char* fragmentShaderPath, std::shared_ptr<Texture2DObject> sourceTexture)
 {
     // We could keep this vertex shader and reuse it, but it looks simpler this way
     std::vector<const char*> vertexShaderPaths;
-    vertexShaderPaths.push_back("shaders/version330.glsl");
-    vertexShaderPaths.push_back("shaders/renderer/fullscreen.vert");
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+    vertexShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/renderer/fullscreen.vert");
     Shader vertexShader = ShaderLoader(Shader::VertexShader).Load(vertexShaderPaths);
 
     std::vector<const char*> fragmentShaderPaths;
-    fragmentShaderPaths.push_back("shaders/version330.glsl");
-    fragmentShaderPaths.push_back("shaders/utils.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/version330.glsl");
+    fragmentShaderPaths.push_back("D:/ITU/Graphics_programming_2025/graphics-programming-2025/exercises/exercise09/shaders/utils.glsl");
     fragmentShaderPaths.push_back(fragmentShaderPath);
     Shader fragmentShader = ShaderLoader(Shader::FragmentShader).Load(fragmentShaderPaths);
 
@@ -390,6 +423,30 @@ void PostFXSceneViewerApplication::RenderGUI()
             if (ImGui::DragFloat("Exposure", &m_exposure, 0.01f, 0.01f, 5.0f))
             {
                 m_composeMaterial->SetUniformValue("Exposure", m_exposure);
+            }
+            if (ImGui::SliderFloat("Contrast", &m_contrast, 0.5f, 1.5f))
+            {
+                m_composeMaterial->SetUniformValue("Contrast", m_contrast);
+            }
+            if (ImGui::SliderFloat("Hue Shift", &m_hueShift, -0.5f, 0.5f))
+            {
+                m_composeMaterial->SetUniformValue("HueShift", m_hueShift);
+            }
+            if (ImGui::SliderFloat("Saturation", &m_saturation, 0.0f, 2.0f))
+            {
+                m_composeMaterial->SetUniformValue("Saturation", m_saturation);
+            }
+            if (ImGui::ColorEdit3("Color Filter", &m_colorFilter.x))
+            {
+                m_composeMaterial->SetUniformValue("ColorFilter", m_colorFilter);
+            }
+            if (ImGui::SliderFloat("Intensity", &m_intensity, 0.0f, 5.0f))
+            {
+                m_bloomMaterial->SetUniformValue("Intensity", m_intensity);
+            }
+            if (ImGui::SliderFloat2("Range", &m_range.x, 0.0f, 5.0f))
+            {
+                m_bloomMaterial->SetUniformValue("Range", m_range);
             }
         }
     }
