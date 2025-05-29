@@ -30,7 +30,7 @@ void main()
     float AmbientOcclusion = texture(ssao, TexCoords).r;
 
     // Calculate Lighting (Blinn-Phong)
-    vec3 ambient = AmbientColor * AmbientReflection;
+    vec3 ambient = AmbientColor * AmbientReflection * objectColor;
     if (SSAOActive == 1) {
         ambient *= AmbientOcclusion; // Here we add the occlusion factor
     } 
